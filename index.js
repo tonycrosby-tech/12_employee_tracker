@@ -220,5 +220,120 @@ function deleteEmp() {
 
   connection.query(query, (err, res) => {
     if (err) throw err;
+
+    const deleteEmpChoices = res.map(({ id, first_name, last_name }) => ({
+      value: id,
+      name: `${id} ${first_name} ${last_name}`
+    }));
+
+    console.table(res);
+    console.log("ArrayToDelete!\n");
+
+    empDelete(deleteEmpChoices);
+  })
+}
+
+function empDelete(deleteEmpChoices) {
+  inquirer.prompt([
+    {
+      type: 'list',
+      name: 'employeeId',
+      choices: deleteEmpChoices,
+    },
+  ])
+  .then(function (answer) {
+    const query = `DELETE FROM employee WHERE ?`;
+
+    connection.query(query, (err, res) => {
+      if (err) throw err;
+
+      console.table(res);
+      console.log(res.affectedRows + "Deleted!\n");
+
+      start();
+    })
+  })
+}
+
+function updateEmpRole() {
+  employeeArr();
+}
+
+function employeeArr() {
+  console.log(`"Updating " + ${first_name} + ${last_name}"'s" + data!`);
+
+  const query = `
+  SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+  FROM employee e
+  JOIN role r
+  ON e.role_id = r.id
+  JOIN department d
+  ON d.id = r.department_id
+  JOIN employee m
+  ON m.id = e.manager_id`;
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+
+    const empChoices = res.map (({ id, first_name, last_name }) => ({
+      value: id,
+      name: `${first_name} ${last_name}`,
+    }));
+
+    console.table(res);
+    console.log("UpdateARR!\n");
+
+    roleArr(empChoices);
+  })
+}
+
+function roleArr(empChoices) {
+  console.log("Updating role!\n");
+
+  const query = `SELECT r.id, r.title, r.salary
+  FROM role r`;
+
+  let roleChoices;
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+
+    roleChoices = res.map(({ id, title, salary }) => ({
+      value: id,
+      title: `${title}`,
+      salary: `${salary}`,
+    }));
+    console.table(res);
+    console.log("roleArr Update!\n");
+
+    promptEmpRole(empChoices, roleChoices);
+  })
+}
+
+function promptEmpRole(empChoices, roleChoices) {
+  inquirer.prompt([
+    {
+      type: 'list',
+      name: 'employeeId',
+      message: 'Which Employee do you want to set with this role?',
+      choices: empChoices,
+    },
+    {
+      type: 'list',
+      name: 'roleId',
+      message: 'Which role do you want to update?',
+      choices: roleChoices,
+    },
+  ])
+  .then(function (answer) {
+    const query = `UPDATE employee SET role_id = ? WHERE id = ?`;
+    connection.query(query, [answer.roleId, answer.employeeId], (err, res) => {
+      if (err) throw err;
+
+      console.table(res);
+      console.log(res.affectedRows + "Updated successfully!");
+
+      start();
+    })
   })
 }
