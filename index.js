@@ -40,29 +40,27 @@ function start() {
         "End",
       ],
     })
-    .then((task) => {
-      switch (task) {
-        case "View Employees":
-          viewEmployees();
-          break;
-        case "View Employees by Department":
-          viewEmpByDept();
-          break;
-        case "Add Employee":
-          addEmp();
-          break;
-        case "Delete Employee":
-          deleteEmp();
-          break;
-        case "Update Employees Role":
-          updateEmpRole();
-          break;
-        case "Add Role":
-          addRole();
-          break;
-        case "End":
-          connection.end();
-          break;
+    .then((answer) => {
+      if (answer.menu === "View Employees") {
+        viewEmployees();
+      }
+      else if (answer.menu === "View Employees by Department") {
+        viewEmpByDept();
+      }
+      else if (answer.menu === "Add Employee") {
+        addEmp();
+      }
+      else if (answer.menu === "Delete Employee") {
+        deleteEmp();
+      }
+      else if (answer.menu === "Update Employees Role") {
+        updateEmpRole();
+      }
+      else if (answer.menu === "Add Role") {
+        promptEmpRole(empChoices, roleChoices);
+      }
+      else if (answer.menu === "End") {
+        connection.end();
       }
     });
 }
@@ -140,7 +138,7 @@ function promptDept(deptChoice) {
         if (err) throw err;
 
         console.table("response", res);
-        console.log(res.affectedRows + "Employees are viewed!\n");
+        console.log("Employees are viewed!\n");
 
         start();
       });
@@ -203,7 +201,7 @@ function promptAdd(roleChoice) {
         if (err) throw err;
 
         console.table(res);
-        console.log(res.insertedRows + "Inserted successfully!\n");
+        console.log("Inserted successfully!\n");
 
         start();
       }
@@ -238,6 +236,7 @@ function empDelete(deleteEmpChoices) {
     {
       type: 'list',
       name: 'employeeId',
+      message: "Which employee do you want to remove?",
       choices: deleteEmpChoices,
     },
   ])
@@ -248,10 +247,11 @@ function empDelete(deleteEmpChoices) {
       if (err) throw err;
 
       console.table(res);
-      console.log(res.affectedRows + "Deleted!\n");
+      console.log("Deleted!\n");
 
       start();
-    })
+    });
+    console.log(query.sql);
   })
 }
 
@@ -331,7 +331,7 @@ function promptEmpRole(empChoices, roleChoices) {
       if (err) throw err;
 
       console.table(res);
-      console.log(res.affectedRows + "Updated successfully!");
+      console.log("Role Updated successfully!");
 
       start();
     })
