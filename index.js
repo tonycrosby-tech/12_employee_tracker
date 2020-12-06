@@ -57,7 +57,7 @@ function start() {
         updateEmpRole();
       }
       else if (answer.menu === "Add Role") {
-        promptEmpRole(empChoices, roleChoices);
+        addRole();
       }
       else if (answer.menu === "End") {
         connection.end();
@@ -243,7 +243,7 @@ function empDelete(deleteEmpChoices) {
   .then(function (answer) {
     const query = `DELETE FROM employee WHERE ?`;
 
-    connection.query(query, (err, res) => {
+    connection.query(query, { id: answer.employeeId }, (err, res) => {
       if (err) throw err;
 
       console.table(res);
@@ -260,7 +260,6 @@ function updateEmpRole() {
 }
 
 function employeeArr() {
-  console.log(`"Updating " + ${first_name} + ${last_name}"'s" + data!`);
 
   const query = `
   SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
@@ -275,7 +274,7 @@ function employeeArr() {
   connection.query(query, (err, res) => {
     if (err) throw err;
 
-    const empChoices = res.map (({ id, first_name, last_name }) => ({
+    const empChoices = res.map(({ id, first_name, last_name }) => ({
       value: id,
       name: `${first_name} ${last_name}`,
     }));
@@ -324,10 +323,11 @@ function promptEmpRole(empChoices, roleChoices) {
       message: 'Which role do you want to update?',
       choices: roleChoices,
     },
+    console.log(empChoices, roleChoices)
   ])
   .then(function (answer) {
     const query = `UPDATE employee SET role_id = ? WHERE id = ?`;
-    connection.query(query, [answer.roleId, answer.employeeId], (err, res) => {
+    connection.query(query, [ answer.employeeId, answer.roleId ], (err, res) => {
       if (err) throw err;
 
       console.table(res);
@@ -336,4 +336,71 @@ function promptEmpRole(empChoices, roleChoices) {
       start();
     })
   })
+}
+
+function addRole() {
+
+  var query =
+    `SELECT d.id, d.name, r.salary AS budget
+    FROM employee e
+    JOIN role r
+    ON e.role_id = r.id
+    JOIN department d
+    ON d.id = r.department_id
+    GROUP BY d.id, d.name`
+
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+
+    const departmentChoices = res.map(({ id, name }) => ({
+      value: id, name: `${id} ${name}`
+    }));
+
+    console.table(res);
+    console.log("Department array!");
+
+    promptAddRole(departmentChoices);
+  });
+}
+
+function promptAddRole(departmentChoices) {
+
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "roleTitle",
+        message: "Role title?"
+      },
+      {
+        type: "input",
+        name: "roleSalary",
+        message: "Role Salary?"
+      },
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Department?",
+        choices: departmentChoices
+      },
+    ])
+    .then(function (answer) {
+
+      var query = `INSERT INTO role SET ?`
+
+      connection.query(query, {
+        title: answer.roleTitle,
+        salary: answer.roleSalary,
+        department_id: answer.departmentId
+      },
+        function (err, res) {
+          if (err) throw err;
+
+          console.table(res);
+          console.log("Role Inserted!");
+
+          start();
+        });
+
+    });
 }
