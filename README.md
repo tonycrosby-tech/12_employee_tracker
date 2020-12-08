@@ -21,6 +21,7 @@
 # Description
 
 This application is an employee tracker. You can view the roles, departments, first name, last name, title, department, salary and manager. You can also add roles and departments as well as employees. Employees can have their roles updated.
+
 # Story
 
 ```
@@ -32,24 +33,25 @@ So that I can organize and plan my business
 # Context
 
 For business owners that need to keep track of a lot of employees.
+
 ## Minimum Requirements
 
-* Functional application.
+- Functional application.
 
-* GitHub repository with a unique name and a README describing the project.
+- GitHub repository with a unique name and a README describing the project.
 
-* The command-line application should allow users to:
+- The command-line application should allow users to:
 
-  * Add departments, roles, employees
+  - Add departments, roles, employees
 
-  * View departments, roles, employees
+  - View departments, roles, employees
 
-  * Update employee roles
+  - Update employee roles
 
 # Screenshots
 
-![Screenshot of homework](./utils/assets/images/homew.JPG)
-![Screenshot of homework](./utils/assets/images/homew2.JPG)
+![Screenshot of homework](./assets/images/homew.JPG)
+![Screenshot of homework](./assets/images/homew2.JPG)
 
 # Deployed Application
 
