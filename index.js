@@ -261,15 +261,7 @@ function updateEmpRole() {
 
 function employeeArr() {
 
-  const query = `
-  SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
-  FROM employee e
-  JOIN role r
-  ON e.role_id = r.id
-  JOIN department d
-  ON d.id = r.department_id
-  JOIN employee m
-  ON m.id = e.manager_id`;
+  const query = `SELECT * FROM employee`;
 
   connection.query(query, (err, res) => {
     if (err) throw err;
@@ -307,6 +299,7 @@ function roleArr(empChoices) {
 
     promptEmpRole(empChoices, roleChoices);
   })
+  console.log(query.sql);
 }
 
 function promptEmpRole(empChoices, roleChoices) {
@@ -335,6 +328,7 @@ function promptEmpRole(empChoices, roleChoices) {
 
       start();
     })
+    console.log(query.sql);
   })
 }
 
